@@ -27,6 +27,14 @@ describe Member do
         expect(Account.with_currency(code).where(member_id: member.id).count).to eq 1
       end
     end
+
+    it 'is valid  with valid role' do
+      expect(build(:member, :level_3, :member_role)).to be_valid
+    end
+
+    it 'is not valid with invalid role' do
+      expect(build(:member, :level_3, role: 'random_role')).to_not be_valid
+    end
   end
 
   describe '#trades' do

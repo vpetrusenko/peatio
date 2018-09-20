@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 describe Admin::CurrenciesController, type: :controller do
-  let(:member) { create(:admin_member) }
+  let(:member) { create(:member, :admin) }
   let :attributes do
     { code:                             'nbn',
       blockchain_key:                   Blockchain.first.key,

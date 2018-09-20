@@ -17,6 +17,7 @@ class Member < ActiveRecord::Base
 
   validates :sn,    presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true, email: true
+  validates :role,  inclusion: { in: -> (_) { Member.roles.map(&:to_s) } }
   validates :level, numericality: { greater_than_or_equal_to: 0 }
 
   after_create :touch_accounts
@@ -30,6 +31,7 @@ class Member < ActiveRecord::Base
         member.transaction do
           info_hash       = auth_hash.fetch('info')
           member.email    = info_hash.fetch('email')
+          member.role     = info_hash['role'] if info_hash.key?('role')
           member.level    = info_hash['level'] if info_hash.key?('level')
           member.disabled = info_hash.key?('state') && info_hash['state'] != 'active'
           member.save!
@@ -45,16 +47,16 @@ class Member < ActiveRecord::Base
       raise e
     end
 
+    def roles
+      %i[member admin].freeze
+    end
+
     def current
       Thread.current[:user]
     end
 
     def current=(user)
       Thread.current[:user] = user
-    end
-
-    def admins
-      Figaro.env.admin.split(',').map(&:squish)
     end
 
     def search(field: nil, term: nil)
@@ -79,12 +81,16 @@ class Member < ActiveRecord::Base
     end
   end
 
+  def role
+    super&.inquiry
+  end
+
   def trades
     Trade.where('bid_member_id = ? OR ask_member_id = ?', id, id)
   end
 
   def admin?
-    @is_admin ||= self.class.admins.include?(self.email)
+    role.admin?
   end
 
   def get_account(model_or_id_or_code)
@@ -160,11 +166,12 @@ private
 end
 
 # == Schema Information
-# Schema version: 20180530122201
+# Schema version: 20180920153114
 #
 # Table name: members
 #
 #  id           :integer          not null, primary key
+#  role         :string(255)      default("member"), not null
 #  level        :integer          default(0), not null
 #  sn           :string(12)       not null
 #  email        :string(255)      not null

@@ -23,9 +23,11 @@ FactoryBot.define do
     end
 
     trait :admin do
-      after :create do |member|
-        ENV['ADMIN'] = (Member.admins << member.email).join(',')
-      end
+      role 'admin'
+    end
+
+    trait :member_role do
+      role 'member'
     end
 
     trait :barong do
@@ -33,7 +35,5 @@ FactoryBot.define do
         member.authentications.build(provider: 'barong', uid: Faker::Internet.password(14, 14)).save!
       end
     end
-
-    factory :admin_member, traits: %i[ admin ]
   end
 end

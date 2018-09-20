@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 describe Admin::WalletsController, type: :controller do
-  let(:member) { create(:admin_member) }
+  let(:member) { create(:member, :admin) }
   let(:existing_currency) { Currency.find('eth') }
   let :attributes do
     { currency_id:        existing_currency.id,

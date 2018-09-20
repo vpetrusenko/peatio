@@ -19,7 +19,7 @@ describe APIv2::Auth::JWTAuthenticator do
   end
 
   let :member do
-    create(:member, :level_3)
+    create(:member, :level_3, :admin)
   end
 
   let :payload do
@@ -82,28 +82,33 @@ describe APIv2::Auth::JWTAuthenticator do
     context 'token issued by Barong' do
       before { payload[:iss] = 'barong' }
 
+      it 'should require role to be present in payload' do
+        payload.merge!(level: 3, state: 'pending', uid: Faker::Internet.password(14, 14), email: Faker::Internet.email)
+        expect { subject.authenticate! }.to raise_error(Peatio::Auth::Error) { |e| expect(e.reason).to match /key not found: :role/ }
+      end
+
       it 'should require level to be present in payload' do
-        payload.merge!(state: 'pending', uid: Faker::Internet.password(14, 14), email: Faker::Internet.email)
+        payload.merge!(role: 'admin', state: 'pending', uid: Faker::Internet.password(14, 14), email: Faker::Internet.email)
         expect { subject.authenticate! }.to raise_error(Peatio::Auth::Error) { |e| expect(e.reason).to match /key not found: :level/ }
       end
 
       it 'should require state to be present in payload' do
-        payload.merge!(level: 1, uid: Faker::Internet.password(14, 14), email: Faker::Internet.email)
+        payload.merge!(role: 'admin', level: 1, uid: Faker::Internet.password(14, 14), email: Faker::Internet.email)
         expect { subject.authenticate! }.to raise_error(Peatio::Auth::Error) { |e| expect(e.reason).to match /key not found: :state/ }
       end
 
       it 'should require UID to be present in payload' do
-        payload.merge!(level: 1, state: 'disabled', email: Faker::Internet.email)
+        payload.merge!(role: 'admin', level: 1, state: 'disabled', email: Faker::Internet.email)
         expect { subject.authenticate! }.to raise_error(Peatio::Auth::Error) { |e| expect(e.reason).to match /key not found: :uid/ }
       end
 
       it 'should require UID to be not blank' do
-        payload.merge!(level: 1, state: 'disabled', email: Faker::Internet.email, uid: ' ')
+        payload.merge!(level: 1, state: 'disabled', email: Faker::Internet.email, uid: ' ', role: 'admin')
         expect { subject.authenticate! }.to raise_error(Peatio::Auth::Error) { |e| expect(e.reason).to match /UID is blank/ }
       end
 
       it 'should register member' do
-        payload.merge!(email: 'guyfrombarong@email.com', uid: 'BARONG1234', state: 'active', level: 2)
+        payload.merge!(email: 'guyfrombarong@email.com', uid: 'BARONG1234', state: 'active', level: 2, role: 'admin')
         expect { subject.authenticate! }.to change(Member, :count).by(1)
         record = Member.last
         expect(record.email).to eq payload[:email]
@@ -114,10 +119,10 @@ describe APIv2::Auth::JWTAuthenticator do
       end
 
       it 'should update member if exists' do
-        member = create(:member, :level_1)
+        member = create(:member, :level_1, :admin)
         uid    = Faker::Internet.password(14, 14)
         member.authentications.build(uid: uid, provider: 'barong').save!
-        payload.merge!(email: member.email, uid: uid, state: 'blocked', level: 3)
+        payload.merge!(email: member.email, uid: uid, state: 'blocked', level: 3, role: 'admin')
         expect { subject.authenticate! }.not_to change(Member, :count)
         member.reload
         expect(member.email).to eq payload[:email]
@@ -129,9 +134,19 @@ describe APIv2::Auth::JWTAuthenticator do
       end
 
       it 'should register new member and return instance' do
-        payload.merge!(email: 'guyfrombarong@email.com', uid: 'BARONG1234', state: '', level: 100)
+        payload.merge!(email: 'guyfrombarong@email.com', uid: 'BARONG1234', state: '', level: 100, role: 'admin')
         expect(subject.authenticate!(return: :member)).to eq Member.last
         expect(Member.last.level).to eq 100
+      end
+
+      it 'should create member with :member role and update it with role from JWT' do
+        member = create(:member, :level_1, :member_role)
+        uid    = Faker::Internet.password(14, 14)
+        member.authentications.build(uid: uid, provider: 'barong').save!
+        payload.merge!(email: member.email, uid: uid, state: 'active', level: 3, role: 'admin')
+        expect { subject.authenticate! }.not_to change(Member, :count)
+        member.reload
+        expect(member.role).to eq 'admin'
       end
     end
   end

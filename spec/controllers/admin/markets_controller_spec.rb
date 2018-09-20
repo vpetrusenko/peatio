@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 describe Admin::MarketsController, type: :controller do
-  let(:member) { create(:admin_member) }
+  let(:member) { create(:member, :admin) }
   let :attributes do
     { bid_unit:      'usd',
       bid_fee:       '0.003'.to_d,

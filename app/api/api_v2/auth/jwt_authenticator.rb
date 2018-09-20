@@ -77,12 +77,13 @@ module APIv2
         Member.find_or_initialize_by(email: fetch_email(payload)).tap do |member|
           member.transaction do
             attributes = {
+              role:     payload.fetch(:role).to_s,
               level:    payload.fetch(:level).to_i,
               disabled: payload.fetch(:state).to_s != 'active' }
 
             # Prevent overheat validations.
             member.assign_attributes(attributes)
-            member.save!(validate: member.new_record?)
+            member.save! if member.changed?
 
             authentication = member.authentications.find_or_initialize_by(provider: 'barong', uid: fetch_uid(payload))
 

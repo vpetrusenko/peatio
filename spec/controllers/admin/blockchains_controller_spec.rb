@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 describe Admin::BlockchainsController, type: :controller do
-  let(:member) { create(:admin_member) }
+  let(:member) { create(:member, :admin) }
   let :attributes do
     { key:                              'eth-rinkeby-new',
       name:                             'Ethereum Rinkeby',
