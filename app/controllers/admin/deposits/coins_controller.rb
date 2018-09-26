@@ -17,8 +17,9 @@ module Admin
       end
 
       def update
-        deposit = ::Deposits::Coin.where(currency: currency).find(params[:id])
-        deposit.accept! if deposit.may_accept?
+        @deposit = ::Deposits::Coin.where(currency: currency).find(params[:id])
+        authorize! :update, @deposit
+        @deposit.accept! if deposit.may_accept?
         redirect_to :back, notice: t('admin.deposits.coins.update.notice')
       end
     end

@@ -3,6 +3,8 @@
 
 module Admin
   class BlockchainsController < BaseController
+    load_and_authorize_resource
+
     def index
       @blockchains = Blockchain.all.page(params[:page]).per(100)
     end

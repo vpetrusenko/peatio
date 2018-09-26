@@ -27,6 +27,7 @@ module Admin
 
       def update
         @withdraw.transaction do
+          authorize! :update, @withdraw
           @withdraw.accept!
           @withdraw.process!
         end

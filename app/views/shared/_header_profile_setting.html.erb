@@ -9,7 +9,7 @@
     <a class="dropdown-item" href="<%= settings_path %>">
       <i class="fa fa-user"></i><span><%= t('header.my_profile') %></span>
     </a>
-    <% if is_admin? %>
+    <% unless is_member? %>
       <a class="dropdown-item" href="<%= admin_dashboard_path %>">
         <i class="fa fa-tachometer-alt"></i>
         <span><%= t('header.admin') %></span>

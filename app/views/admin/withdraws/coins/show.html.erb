@@ -25,7 +25,7 @@
           <%= item_for @withdraw, :amount %>
           <hr>
           <ul class="list-inline w-100 px-3 mt-3 pt-3 border-top">
-            <% if @withdraw.may_reject? %>
+            <% if @withdraw.may_reject? and can? :manage, Withdraw %>
               <li>
                 <%= link_to 'Reject',
                             admin_withdraw_path(@withdraw.currency.code, @withdraw),
@@ -33,7 +33,7 @@
                             method:  'DELETE' %>
               </li>
             <% end %>
-            <% if @withdraw.may_accept? || @withdraw.may_process? %>
+            <% if @withdraw.may_accept? or @withdraw.may_process? and can? :manage, :Withdraw %>
               <li>
                 <%= link_to 'Process',
                             admin_withdraw_path(@withdraw.currency.code, @withdraw),

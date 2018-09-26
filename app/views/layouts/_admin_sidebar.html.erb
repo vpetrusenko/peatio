@@ -18,8 +18,11 @@
         <div class="col d-flex align-items-center">
           <div>
             <h2 class="h5 m-0"><%= current_user.email.truncate(12) %></h2>
-            <% if is_admin? %>
-            <h3 class="h6 text-muted mt-1 mb-0">Administrator</h3>
+            <% if current_user.role.admin? %>
+              <h3 class="h6 text-muted mt-1 mb-0">Administrator</h3>
+            <% end %>
+            <% if current_user.role.accountant? %>
+              <h3 class="h6 text-muted mt-1 mb-0">Accountant</h3>
             <% end %>
           </div>
         </div>
@@ -47,12 +50,14 @@
         </li>
       <% end %>
 
-      <li class="list-icon-item <%= check_active('currencies') %>">
-        <%= link_to admin_currencies_path do %>
-          <i class="icon fa fa-dollar-sign"></i>
-          <span class="menu-text">Currencies</span>
-        <% end %>
-      </li>
+      <% if can? :manage, Currency %>
+        <li class="list-icon-item <%= check_active('currencies') %>">
+          <%= link_to admin_currencies_path do %>
+            <i class="icon fa fa-dollar-sign"></i>
+            <span class="menu-text">Currencies</span>
+          <% end %>
+        </li>
+      <% end %>
 
       <% if can? :manage, Market %>
         <li class="list-icon-item <%= check_active('markets') %>">
@@ -104,7 +109,7 @@
         </li>
       <% end %>
 
-      <% if can? :manage, Member %>
+      <% if can? :read, Member %>
         <li class="list-icon-item <%= check_active('members') %>">
           <%= link_to admin_members_path do %>
             <i class="icon fa fa-users"></i>

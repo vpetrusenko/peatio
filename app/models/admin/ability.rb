@@ -6,22 +6,35 @@ module Admin
     include CanCan::Ability
 
     def initialize(user)
-      return unless user.admin?
+      return if user.role.member?
 
-      can :read, Order
-      can :read, Trade
-      can :manage, Member
+      case user&.role
+        when 'admin'
+          can :read, Order
+          can :read, Trade
+          can :manage, Member
 
-      can :menu, Deposit
-      Deposit.descendants.each { |d| can :manage, d }
+          can :menu, Deposit
+          Deposit.descendants.each { |d| can :manage, d }
 
-      can :menu, Withdraw
-      Withdraw.descendants.each { |w| can :manage, w }
+          can :menu, Withdraw
+          Withdraw.descendants.each { |w| can :manage, w }
 
-      can :manage, Market
-      can :manage, Currency
-      can :manage, Blockchain
-      can :manage, Wallet
+          can :manage, Market
+          can :manage, Currency
+          can :manage, Blockchain
+          can :manage, Wallet
+        when 'accountant'
+          can :read, Order
+          can :read, Trade
+          can :read, Member
+
+          can :menu, Deposit
+          Deposit.descendants.each { |d| can :read, d }
+
+          can :menu, Withdraw
+          Withdraw.descendants.each { |w| can :read, w }
+      end
     end
   end
 end

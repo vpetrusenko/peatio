@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception
 
-  helper_method :current_user, :is_admin?, :current_market, :gon
+  helper_method :current_user, :is_member?, :current_market, :gon
   before_action :set_language, :set_gon
   around_action :share_user
 
@@ -37,11 +37,11 @@ private
   end
 
   def auth_admin!
-    redirect_to root_path unless is_admin?
+    redirect_to root_path if is_member?
   end
 
-  def is_admin?
-    current_user&.admin?
+  def is_member?
+    current_user&.role.member?
   end
 
   def set_gon

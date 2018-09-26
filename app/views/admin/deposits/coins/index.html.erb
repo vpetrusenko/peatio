@@ -22,7 +22,7 @@
     <% end %>
     <% t.column :state_and_actions do |x| %>
       <span><%= x.aasm_state.humanize %></span>
-      <% if x.may_accept? %>
+      <% if x.may_accept? and can? :manage, Deposit %>
         <span> / </span>
         <%= link_to t('admin.deposits.coins.index.accept'),
                     admin_deposit_path(x.currency.code, x),

@@ -5,7 +5,10 @@
 <% end %>
 
 <% content_for :guide do %>
-  <% if current_user.admin? %>
+  <% if current_user.role.admin? %>
     <span class="badge badge-warning">ADMIN</span>
+  <% end %>
+  <% if current_user.role.accountant? %>
+    <span class="badge badge-warning">ACCOUNTANT</span>
   <% end %>
 <% end %>

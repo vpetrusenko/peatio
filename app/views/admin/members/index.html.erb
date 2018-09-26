@@ -27,12 +27,14 @@
         <%= x.sn %>
     <% end %>
     <% t.column :created_at, 'Created At' %>
-    <% t.column 'Disabled? (Web/API)' do |x| %>
-      <% text = x.disabled? ? 'Yes' : 'No' %>
-      <%= link_to text, toggle_admin_member_path(x), remote: true, method: :post, class: 'toggle-web' %>
-      &nbsp;/&nbsp;
-      <% text = x.api_disabled? ? 'Yes' : 'No' %>
-      <%= link_to text, toggle_admin_member_path(x, api: true), remote: true, method: :post, class: 'toggle-api' %>
+    <% if can? :manage, Member %>
+      <% t.column 'Disabled? (Web/API)' do |x| %>
+        <% text = x.disabled? ? 'Yes' : 'No' %>
+        <%= link_to text, toggle_admin_member_path(x), remote: true, method: :post, class: 'toggle-web' %>
+      &nbsp;  /&nbsp;
+        <% text = x.api_disabled? ? 'Yes' : 'No' %>
+        <%= link_to text, toggle_admin_member_path(x, api: true), remote: true, method: :post, class: 'toggle-api' %>
+      <% end %>
     <% end %>
     <% t.column :actions, 'Actions' do |x| %>
       <%= link_to t('actions.view'), url_for([:admin, x]) %>

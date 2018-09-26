@@ -14,6 +14,7 @@ module Admin
 
       def new
         @deposit = ::Deposits::Fiat.new
+        authorize! :create, @deposit
       end
 
       def show
@@ -32,7 +33,8 @@ module Admin
       end
 
       def update
-        ::Deposits::Fiat.where(currency: currency).find(params[:id]).charge!
+        @deposit = ::Deposits::Fiat.where(currency: currency).find(params[:id]).charge!
+        authorize! :update, @deposit
         redirect_to :back
       end
 

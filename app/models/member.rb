@@ -83,8 +83,8 @@ class Member < ActiveRecord::Base
     Trade.where('bid_member_id = ? OR ask_member_id = ?', id, id)
   end
 
-  def admin?
-    @is_admin ||= self.class.admins.include?(self.email)
+  def role
+    super.inquiry
   end
 
   def get_account(model_or_id_or_code)

@@ -3,6 +3,8 @@
 
 module Admin
   class WalletsController < BaseController
+    load_and_authorize_resource
+
     def index
       @wallets = Wallet.all.page(params[:page]).per(100)
     end

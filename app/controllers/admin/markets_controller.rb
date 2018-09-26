@@ -3,6 +3,8 @@
 
 module Admin
   class MarketsController < BaseController
+    load_and_authorize_resource
+
     def index
       @markets = Market.ordered.page(params[:page]).per(100)
     end

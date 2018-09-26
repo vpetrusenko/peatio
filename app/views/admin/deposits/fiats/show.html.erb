@@ -13,7 +13,7 @@
           <dt>State</dt> <dd><%= @deposit.aasm_state.humanize %></dd>
         <% end %>
       </div>
-      <% if @deposit.may_accept? %>
+      <% if @deposit.may_accept? and can? :manage, Deposit%>
         <div class="card-footer clearfix">
           <%= form_for @deposit, url: admin_deposit_url(@deposit.currency.code, @deposit) do |f| %>
             <%= f.submit 'Accept', class: 'btn btn-primary float-right' %>
