@@ -535,10 +535,9 @@ en:
   'false': false
   view_on_github: View on Github
   slogan:
-    heading: Peatio Open-Source Exchange
+    heading: ThalerOne Exchange
     subheading: Cloud deployment made simple and secure
-    text1: Peatio - Cryptocurrency exchange for managing digital currency.
-    text2: We provide Peatio installation and configuration services.
+    text1: ThalerOne - Cryptocurrency exchange for managing digital currency.
   trade:
     markets: Markets
     realtime_price:
